@@ -82,9 +82,10 @@ def part_4(df):
 
 def part_5(df):
     """
-    Compute the area in degrees of a
+    Compute the area in square km of the 1 sigma ellipse for a 2D gaussian fit 
+    to latitudes and longitudes.
 
-    prints 'Answer to part 5 is 0.0242225349\n'
+    prints 'Answer to part 5 is 225.8509156285\n'
     """
     obs = np.zeros((df.shape[0], 2))
     obs[:, 0] = df['Latitude']
@@ -134,7 +135,7 @@ if __name__ == '__main__':
                      usecols=[1, 3, 5, 24, 50, 51])
     part_1(df)
     part_2(df)
-    #datetimes = part_3(df)
+    datetimes = part_3(df)
     part_4(df)
     part_5(df)
-    #part_6(datetimes)
+    part_6(datetimes)
