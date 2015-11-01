@@ -1,0 +1,131 @@
+<!doctype html>
+<HTML>
+<title>Ross Fadely's Data Incubator Project Proposal</title>
+  <HEAD>
+    <LINK href="{{ url_for('static', filename='stylesheets/style.css') }}" rel="stylesheet" type="text/css">
+  </HEAD>
+<div class=page>
+  <h1>Ross Fadely's Data Incubator Project Proposal</h1>
+     <br><p>
+        <h3>Digging deep into medical discharge data!</h3><br>
+<p><div class=section> Overview </div></p>
+
+During my time at the Data Incubator, I propose to examine the New York State
+Medical Discharge Records provided by the state government.  The focus of this 
+work would be to develop models that accurately characterize the cost and 
+length of medical facility (e.g., Hospital) visits.  Such an analysis would 
+provide patients with a means of accurately anticipating these quantities, and 
+providers could use the models to understand areas in need of improvement.
+<br><br>
+Exploratory analysis shows indeed there is a predictable correlation between
+the features of the data and cost, length of stay.  However, it is clear that 
+scatter in such predictions are significant.  Time at the incubator would 
+allow me to investigate the source of the uncertainty, and build models that 
+both improve the accuracy of predictions and capture the uncertainty 
+associated with predictions.
+<br><br>
+Finally, the dataset has interesting aspects not investigated during this
+initial exploration.  In particular the data span 5 years time, provide
+reports from roughly 200 facilities across the state, and give demographic
+information like gender and race.  During my time, I propose to look into
+aspects of cost and length of stay conditioned on these quantities.  It would
+be very interesting to see variation as a function of time, place, and (say) 
+race.
+
+<p><div class=section> The data.</div></p>
+  <li>Discharges from 2009 to 2013 provided by 
+<a href="http://on.ny.gov/1k2mJKq">New York State.</a></li><br>
+<li>Columns are: Health Service Area, Hospital County, Operating Certificate
+Number, Facility Id, Facility Name, Age Group, Zip Code, Gender, Race,
+Ethnicity, Length of Stay, Admit Day of Week, Type of Admission, Patient
+Disposition, Discharge Year, Discharge Day of Week, CCS Diagnosis Code, 
+CCS Diagnosis Description, CCS Procedure Description, APR DRG Code, APR DRG
+Description, APR MDC Code, APR MDC Description, APR Severity of Illness Code,
+APR Severity of Illness Description, APR Risk of Mortality, APR Medical
+Surgical Description, Source of Payment (1, 2, 3), Attending/Operating/Other 
+Provider License Number, Abortion Edit Indicator, Emergency Dept. Indicator, 
+and Total Charges.
+</li><br>
+<li> Size of the 2013 table (use for exploration below) is about 2.2 million
+rows, or about 900 MB.
+</li><br>
+
+<p><div class=section> Exploratory analysis.</div></p>
+
+<b>Code for the analysis lives 
+<a href="http://bit.ly/1k2vZhI">on Github.</a></b></li><br><br>
+
+In order to explore whether or not this project is at all possible, I wanted
+see (in a course sense) if the cost and length of stay of medical visits was 
+predictable.  Here are the steps taken, which can be seen in
+<a href="http://bit.ly/1k2vZhI">proj.py.</a></li><br>.
+<br>
+<li>Focus on the data from 2013 only, this involves approximately 200 million 
+rows in the table.
+</li><br>
+<li>Select a subset of the features to keep the dimensionality reasonable:
+'Facility Id', 'Age Group',
+'Type of Admission', 'CCS Diagnosis Code', 'APR DRG Code', 'APR MDC Code',
+'APR Severity of Illness Code', 'Source of Payment 1',
+'Abortion Edit Indicator', and 'Emergency Department Indicator'.  These were 
+selected as they seemed likely to be relevant for the predictions.
+</li><br>
+<li>The entries in the table are categorical, and are formatted as strings.
+Convert the entries into integer representations of the categories.
+</li><br>
+<li>The idea for a first stab is to run a Random Forest regression to make the
+predictions, using scikit-learn's implementation.  This assumes that the input 
+is continuous, or at least ordinal.  To circumvent this we encode the data in 
+a vectorized, 'one hot' form using scikit-learn's OneHotEncoder.
+</li><br>
+<li>Split the data into train and test sets.  Train the Random Forest on the 
+training set, and predict on the test set.  During this process, the total
+amount of data used was limited to only 100k samples due to the length of the 
+training process and the limited amount of time available for this exploration.
+</li><br>
+<p><div class=section> Results and conclusions</div></p>
+
+Below are two plots showing the predicted cost and length of stay versus the 
+true values of the held out test set. <br><br>
+
+	    <img src="http://bbq.dfm.io/~rfadely/di_challenge/plots/cost.png" width="500" height="500"> <br>
+	    <img src="http://bbq.dfm.io/~rfadely/di_challenge/plots/stay.png" width="500" height="500"> <br>
+
+The results look a bit rough - the scatter in the predicted versus the
+true values can be quite large.  However, it is clear that there is a
+predictable correlation.<br><br>
+
+<b>It is important to keep in mind the many limitations of what has been done
+here.</b>
+<li>No feature selection has been done, nor has subsets of the features been 
+used to create conditional models.
+</li>
+<li>Only a small fraction of the data was used to generate these results.
+</li>
+<li>No hyperparameter selection was made via a validation set.  For Random
+Forests, the maximum depth is often considered a very important hyperparameter.
+</li><br>
+
+It is fair to say that its possible these quantities are simply hard to
+predict.  However, given
+the amount of available data I am optimistic very good predictors can be 
+created, especially if a 'Mixture of Experts' approach is considered for
+feature subsets.  If it turns out that the variation truly is large and
+instrinsic, it would still be useful to build models which capture and describe
+the variation.<br><br>
+
+<b>Ideas for the development of the project.</b>
+<li>Build models which can use all of the available data, either using online 
+methods or models which are conditioned on parts of the feature space.
+<li>These models might include simpler methods, like nearest neighbors or
+statistics on variances, or more complex things like neural networks.  One 
+model I would be interested to try are Mondrian Forests, which scale well and 
+can be used to model uncertainties.
+</li>
+<li>After models have been created, look at how they change with location,
+time, race/ethnicity, gender, etc.  Create cool visualizations to show how the 
+predictions vary with these factors.
+</li><br>
+        </ul>
+  </div>
+</HTML>
